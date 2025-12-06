@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Logo AI Generator</title>
+</head>
+<body>
+  <h1>Logo AI Generator</h1>
+
+  <form id="logoForm">
+    <input name="brand" placeholder="Firmenname" required><br>
+    <input name="industry" placeholder="Branche (z.B. Fitness, Mode)" required><br>
+    <input name="style" placeholder="Stil (z.B. modern, minimalistisch)" required><br>
+    <input name="colors" placeholder="Farben (z.B. schwarz, blau)" required><br>
+    <input name="shape" placeholder="Icon (z.B. Tier, Buchstabe, Symbol)" required><br><br>
+
+    <button type="submit">Logo generieren</button>
+  </form>
+
+  <div id="results"></div>
+
+  <script>
+    document.getElementById("logoForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const body = Object.fromEntries(formData.entries());
+
+      const res = await fetch("/generate", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+      const container = document.getElementById("results");
+      container.innerHTML = "";
+
+      if (data.data) {
+        data.data.forEach(imgData => {
+          const img = new Image();
+          img.src = "data:image/png;base64," + imgData.b64_json;
+          img.width = 300;
+          container.appendChild(img);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
